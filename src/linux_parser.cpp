@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -68,7 +69,35 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() {
+  string line;
+  string key;
+  unsigned int value;
+  std::map<std::string, long> meminfo;
+  // The /proc/meminfo string split is based on method:
+  // - https://stackoverflow.com/a/60782724/2153439
+  // - https://stackoverflow.com/a/26530289/2153439
+  char delim = ' ';
+  std::ifstream filestream(kProcDirectory + kMeminfoFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      size_t start = line.find_first_not_of(delim, 0);
+      size_t end = line.find(delim, start);
+      // Assume first string is key value
+      key = line.substr(start, end - start);
+      start = line.find_first_not_of(delim, end);
+      end = line.find(delim, start);
+      // Assume second string is value and convert to unsigned int
+      std::istringstream(line.substr(start, end - start)) >> value;
+      meminfo[key] = value;
+    }
+  }
+  // System memory utilization computation is based on <TODO>
+  unsigned int totalUsed = meminfo["MemTotal:"] - meminfo["MemFree:"];
+  unsigned int memTotal = meminfo["MemTotal:"];
+  return static_cast<float>(totalUsed) / static_cast<float>(memTotal);
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
