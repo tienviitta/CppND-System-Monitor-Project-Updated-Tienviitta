@@ -116,7 +116,27 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() {
+  string line;
+  std::map<std::string, long> meminfo;
+  // The /proc/stat string split is based on method:
+  // - https://stackoverflow.com/a/60782724/2153439
+  char delim = ' ';
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    std::vector<std::string> cpustat;
+    size_t start;
+    size_t end = 0;
+    while ((start = line.find_first_not_of(delim, end)) != std::string::npos) {
+      end = line.find(delim, start);
+      cpustat.push_back(line.substr(start, end - start));
+    }
+    return cpustat;
+  }
+  return {};
+}
 
 // TODO: Read and return the total number of processes
 int LinuxParser::TotalProcesses() { return 0; }
