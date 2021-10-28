@@ -75,36 +75,22 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization (OBSOLETE)
-float LinuxParser::MemoryUtilization() {
-  string line;
-  string key;
-  long value;
-  std::map<std::string, long> meminfo;
-  char delim = ' ';
-  std::ifstream filestream(kProcDirectory + kMeminfoFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
-      std::istringstream linestream(line);
-      size_t start = line.find_first_not_of(delim, 0);
-      size_t end = line.find(delim, start);
-      // Assume first string is key value
-      key = line.substr(start, end - start);
-      start = line.find_first_not_of(delim, end);
-      end = line.find(delim, start);
-      // Assume second string is value and convert to long
-      std::istringstream(line.substr(start, end - start)) >> value;
-      meminfo[key] = value;
-    }
-  }
-  // System memory utilization computation is based on <TODO>
-  long totalUsed = meminfo["MemTotal:"] - meminfo["MemFree:"];
-  long memTotal = meminfo["MemTotal:"];
-  return static_cast<float>(totalUsed) / static_cast<float>(memTotal);
-}
+// TODO: Read and return the system memory utilization
+float LinuxParser::MemoryUtilization() { return 0.0; }
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  float uptime, idle;
+  string line;
+  std::ifstream stream(kProcDirectory + kUptimeFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    linestream >> uptime >> idle;
+  }
+  // long sysUptime = static_cast<long>(uptime);
+  return static_cast<long>(uptime);
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }

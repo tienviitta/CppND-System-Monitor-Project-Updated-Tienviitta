@@ -31,7 +31,7 @@ std::string System::Kernel() {
 }
 
 // TODO: Return the system's memory utilization
-float System::MemoryUtilization() { 
+float System::MemoryUtilization() {
   // System memory utilization computation is based on <TODO>
   long totalUsed = procMeminfo_["MemTotal:"] - procMeminfo_["MemFree:"];
   long memTotal = procMeminfo_["MemTotal:"];
@@ -62,4 +62,4 @@ int System::TotalProcesses() {
 }
 
 // TODO: Return the number of seconds since the system started running
-long int System::UpTime() { return 0; }
+long int System::UpTime() { return LinuxParser::UpTime(); }
