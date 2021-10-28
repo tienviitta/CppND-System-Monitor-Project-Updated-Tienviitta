@@ -1,6 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,8 @@ class System {
   Processor cpu_ = {};
   std::string os_ = "";
   std::string kernel_ = "";
+  std::map<std::string, std::vector<long>> procStat_;
+  std::map<std::string, long> procMeminfo_;
   std::vector<Process> processes_ = {};
 };
 

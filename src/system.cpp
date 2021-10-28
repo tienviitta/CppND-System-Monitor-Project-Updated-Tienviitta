@@ -31,7 +31,12 @@ std::string System::Kernel() {
 }
 
 // TODO: Return the system's memory utilization
-float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
+float System::MemoryUtilization() { 
+  // System memory utilization computation is based on <TODO>
+  long totalUsed = procMeminfo_["MemTotal:"] - procMeminfo_["MemFree:"];
+  long memTotal = procMeminfo_["MemTotal:"];
+  return static_cast<float>(totalUsed) / static_cast<float>(memTotal);
+}
 
 // Return the operating system name
 std::string System::OperatingSystem() {
@@ -39,14 +44,22 @@ std::string System::OperatingSystem() {
     // Cache OS
     os_ = LinuxParser::OperatingSystem();
   }
+  // Parse /proc/stat
+  procStat_ = LinuxParser::ParseProcStat();
+  // Parse /proc/stat
+  procMeminfo_ = LinuxParser::ParseProcMeminfo();
   return os_;
 }
 
 // TODO: Return the number of processes actively running on the system
-int System::RunningProcesses() { return 0; }
+int System::RunningProcesses() {
+  return static_cast<int>(procStat_["procs_running"].at(0));
+}
 
 // TODO: Return the total number of processes on the system
-int System::TotalProcesses() { return 0; }
+int System::TotalProcesses() {
+  return static_cast<int>(procStat_["processes"].at(0));
+}
 
 // TODO: Return the number of seconds since the system started running
 long int System::UpTime() { return 0; }

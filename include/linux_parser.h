@@ -26,6 +26,8 @@ int TotalProcesses();
 int RunningProcesses();
 std::string OperatingSystem();
 std::string Kernel();
+std::map<std::string, std::vector<long>> ParseProcStat();
+std::map<std::string, long> ParseProcMeminfo();
 
 // CPU
 enum CPUStates {

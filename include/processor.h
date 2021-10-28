@@ -10,9 +10,9 @@ class Processor {
   // TODO: Declare any necessary private members
  private:
   // Previous total CPU time
-  unsigned int p_total = 0;
+  long p_total = 0;
   // Previous idle CPU time
-  unsigned int p_idle = 0;
+  long p_idle = 0;
 };
 
 #endif

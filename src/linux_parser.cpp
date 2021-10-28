@@ -12,6 +12,13 @@ using std::string;
 using std::to_string;
 using std::vector;
 
+// The /proc/stat string split is based on method:
+// - https://stackoverflow.com/a/60782724/2153439
+
+// The /proc/meminfo string split is based on method:
+// - https://stackoverflow.com/a/60782724/2153439
+// - https://stackoverflow.com/a/26530289/2153439
+
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
@@ -68,15 +75,12 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
+// TODO: Read and return the system memory utilization (OBSOLETE)
 float LinuxParser::MemoryUtilization() {
   string line;
   string key;
-  unsigned int value;
+  long value;
   std::map<std::string, long> meminfo;
-  // The /proc/meminfo string split is based on method:
-  // - https://stackoverflow.com/a/60782724/2153439
-  // - https://stackoverflow.com/a/26530289/2153439
   char delim = ' ';
   std::ifstream filestream(kProcDirectory + kMeminfoFilename);
   if (filestream.is_open()) {
@@ -88,14 +92,14 @@ float LinuxParser::MemoryUtilization() {
       key = line.substr(start, end - start);
       start = line.find_first_not_of(delim, end);
       end = line.find(delim, start);
-      // Assume second string is value and convert to unsigned int
+      // Assume second string is value and convert to long
       std::istringstream(line.substr(start, end - start)) >> value;
       meminfo[key] = value;
     }
   }
   // System memory utilization computation is based on <TODO>
-  unsigned int totalUsed = meminfo["MemTotal:"] - meminfo["MemFree:"];
-  unsigned int memTotal = meminfo["MemTotal:"];
+  long totalUsed = meminfo["MemTotal:"] - meminfo["MemFree:"];
+  long memTotal = meminfo["MemTotal:"];
   return static_cast<float>(totalUsed) / static_cast<float>(memTotal);
 }
 
@@ -118,9 +122,6 @@ long LinuxParser::IdleJiffies() { return 0; }
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() {
   string line;
-  std::map<std::string, long> meminfo;
-  // The /proc/stat string split is based on method:
-  // - https://stackoverflow.com/a/60782724/2153439
   char delim = ' ';
   std::ifstream filestream(kProcDirectory + kStatFilename);
   if (filestream.is_open()) {
@@ -163,3 +164,57 @@ string LinuxParser::User(int pid [[maybe_unused]]) { return string(); }
 // TODO: Read and return the uptime of a process
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+
+// Read and return the /proc/stat
+std::map<std::string, std::vector<long>> LinuxParser::ParseProcStat() {
+  string key;
+  string line;
+  long value;
+  char delim = ' ';
+  std::map<std::string, std::vector<long>> procStat;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::vector<long> values = {};
+      std::istringstream linestream(line);
+      // Assume first string is key value
+      size_t start = line.find_first_not_of(delim, 0);
+      size_t end = line.find(delim, start);
+      key = line.substr(start, end - start);
+      // Convert other strings to long
+      while ((start = line.find_first_not_of(delim, end)) !=
+             std::string::npos) {
+        end = line.find(delim, start);
+        std::istringstream(line.substr(start, end - start)) >> value;
+        values.push_back(value);
+      }
+      procStat[key] = values;
+    }
+  }
+  return procStat;
+}
+
+// Read and return the /proc/meminfo
+std::map<std::string, long> LinuxParser::ParseProcMeminfo() {
+  string line;
+  string key;
+  long value;
+  std::map<std::string, long> procMeminfo;
+  char delim = ' ';
+  std::ifstream filestream(kProcDirectory + kMeminfoFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      size_t start = line.find_first_not_of(delim, 0);
+      size_t end = line.find(delim, start);
+      // Assume first string is key value
+      key = line.substr(start, end - start);
+      start = line.find_first_not_of(delim, end);
+      end = line.find(delim, start);
+      // Assume second string is value and convert to long
+      std::istringstream(line.substr(start, end - start)) >> value;
+      procMeminfo[key] = value;
+    }
+  }
+  return procMeminfo;
+}
