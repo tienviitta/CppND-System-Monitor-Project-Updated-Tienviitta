@@ -9,9 +9,10 @@ class Processor {
 
   // TODO: Declare any necessary private members
  private:
-  bool enableCpuUtilization = false;
-  unsigned int cpuLastSum;
-  unsigned int cpuLastIdle;
+  // Previous total CPU time
+  unsigned int p_total = 0;
+  // Previous idle CPU time
+  unsigned int p_idle = 0;
 };
 
 #endif
