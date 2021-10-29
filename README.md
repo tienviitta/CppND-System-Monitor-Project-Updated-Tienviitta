@@ -39,3 +39,25 @@ This project uses [Make](https://www.gnu.org/software/make/). The Makefile has f
 5. Implement the `System`, `Process`, and `Processor` classes, as well as functions within the `LinuxParser` namespace.
 
 6. Submit!
+
+## Project Specification
+
+* Basic Requirements
+  + The program must build an executable system monitor.
+  + The program must build without generating compiler warnings.
+  + The system monitor must run continuously without error, until the user terminates the program.
+  + The project should be organized into appropriate classes.
+* System Requirements
+  + The system monitor program should list at least the operating system, kernel version, memory utilization, total number of processes, number of running processes, and uptime.
+  + **TODO**: The System class should be composed of at least one other class.??
+* Processor Requirements
+  + The system monitor should display the CPU utilization.
+* Process Requirements
+  + The system monitor should display a partial list of processes running on the system.
+  + The system monitor should display the PID, user, CPU utilization, memory utilization, uptime, and command for each process.
+* Suggestions
+  + Calculate CPU utilization dynamically, based on recent utilization
+  + Sort processes based on CPU or memory utilization
+  + Make the display interactive
+  + Restructure the program to use abstract classes (interfaces) and pure virtual functions
+  + Port the program to another operating system
