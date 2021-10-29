@@ -118,7 +118,7 @@ vector<string> LinuxParser::CpuUtilization() {
     size_t end = 0;
     while ((start = line.find_first_not_of(delim, end)) != std::string::npos) {
       end = line.find(delim, start);
-      cpustat.push_back(line.substr(start, end - start));
+      cpustat.emplace_back(line.substr(start, end - start));
     }
     return cpustat;
   }
@@ -141,7 +141,24 @@ string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
 
 // TODO: Read and return the user ID associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Uid(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Uid(int pid) {
+  string line;
+  string key;
+  string value;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatusFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+        if (key == "Uid:") {
+          std::replace(value.begin(), value.end(), '_', ' ');
+          return value;
+        }
+      }
+    }
+  }
+  return value;
+}
 
 // TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
@@ -172,7 +189,7 @@ std::map<std::string, std::vector<long>> LinuxParser::ParseProcStat() {
              std::string::npos) {
         end = line.find(delim, start);
         std::istringstream(line.substr(start, end - start)) >> value;
-        values.push_back(value);
+        values.emplace_back(value);
       }
       procStat[key] = values;
     }

@@ -7,9 +7,17 @@
 #include <string>
 #include <vector>
 
+#include "linux_parser.h"
+
 using std::string;
 using std::to_string;
 using std::vector;
+
+// Constructor
+Process::Process(int pid) {
+  pid_ = pid;
+  uid_ = LinuxParser::Uid(pid);
+}
 
 // TODO: Return this process's ID
 int Process::Pid() { return 0; }
