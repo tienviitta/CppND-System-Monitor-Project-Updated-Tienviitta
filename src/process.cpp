@@ -17,13 +17,14 @@ using std::vector;
 Process::Process(int pid) {
   pid_ = pid;
   user_ = LinuxParser::User(pid_);
+  cpu_ = LinuxParser::CpuUtilization(pid_);
 }
 
 // TODO: Return this process's ID
 int Process::Pid() { return pid_; }
 
 // TODO: Return this process's CPU utilization
-float Process::CpuUtilization() { return 0; }
+float Process::CpuUtilization() { return cpu_; }
 
 // TODO: Return the command that generated this process
 string Process::Command() { return string(); }

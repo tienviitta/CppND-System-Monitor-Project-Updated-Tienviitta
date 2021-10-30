@@ -88,8 +88,8 @@ long LinuxParser::UpTime() {
     std::istringstream linestream(line);
     linestream >> uptime >> idle;
   }
-  // long sysUptime = static_cast<long>(uptime);
-  return static_cast<long>(uptime);
+  // return static_cast<long>(uptime);
+  return static_cast<long>(uptime + idle);
 }
 
 // TODO: Read and return the number of jiffies for the system
@@ -123,6 +123,34 @@ vector<string> LinuxParser::CpuUtilization() {
     return cpustat;
   }
   return {};
+}
+
+// TODO: Read and return CPU utilization
+float LinuxParser::CpuUtilization(int pid) {
+  string line;
+  long value;
+  char delim = ' ';
+  std::vector<long> cpustat;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    size_t start;
+    size_t end = 0;
+    while ((start = line.find_first_not_of(delim, end)) != std::string::npos) {
+      end = line.find(delim, start);
+      std::istringstream(line.substr(start, end - start)) >> value;
+      cpustat.emplace_back(value);
+    }
+  }
+  long herz = sysconf(_SC_CLK_TCK);
+  long upTime = LinuxParser::UpTime();
+  long totalTime = cpustat[13] + cpustat[14] + cpustat[15] + cpustat[16];
+  long startTime = cpustat[21];
+  long seconds = upTime - (startTime / herz);
+  float cpu =
+      static_cast<float>((totalTime / herz)) / static_cast<float>(seconds);
+  return cpu;
 }
 
 // TODO: Read and return the total number of processes
