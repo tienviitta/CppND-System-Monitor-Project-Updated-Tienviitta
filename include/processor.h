@@ -5,14 +5,13 @@
 
 class Processor {
  public:
-  float Utilization();  // TODO: See src/processor.cpp
+  float Utilization();
 
-  // TODO: Declare any necessary private members
  private:
   // Previous total CPU time
-  long p_total = 0;
+  long prevTotal = 0;
   // Previous idle CPU time
-  long p_idle = 0;
+  long prevIdle = 0;
 };
 
 #endif

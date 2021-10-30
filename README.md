@@ -49,7 +49,7 @@ This project uses [Make](https://www.gnu.org/software/make/). The Makefile has f
   + The project should be organized into appropriate classes.
 * System Requirements
   + The system monitor program should list at least the operating system, kernel version, memory utilization, total number of processes, number of running processes, and uptime.
-  + **TODO**: The System class should be composed of at least one other class.??
+  + **The System class should be composed of at least one other class.??**
 * Processor Requirements
   + The system monitor should display the CPU utilization.
 * Process Requirements

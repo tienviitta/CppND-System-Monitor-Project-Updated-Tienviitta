@@ -5,6 +5,8 @@
 
 #include "linux_parser.h"
 
+using namespace LinuxParser;
+
 // Return the aggregate CPU utilization
 float Processor::Utilization() {
   // Get CPU times from the "cpu" line
@@ -19,18 +21,17 @@ float Processor::Utilization() {
   }
 
   // Compute CPU utilization
-  // - 0:user, 1:nice, 2:system, 3:idle, 4:iowait, 5:irq,
-  // - 6:softirq, 7:steal, 8:guest, 9:guest_nice
-  // idle + iowait
-  long idle = cpuUtil[3] + cpuUtil[4];
-  // user + nice + system + irq + softirq + steal
-  long nonIdle = cpuUtil[0] + cpuUtil[1] + cpuUtil[2] + cpuUtil[5] +
-                 cpuUtil[6] + cpuUtil[7];
+  // - idle + iowait
+  long idle = cpuUtil[kIdle_] + cpuUtil[kIOwait_];
+  // - user + nice + system + irq + softirq + steal
+  long nonIdle = cpuUtil[kUser_] + cpuUtil[kNice_] + cpuUtil[kSystem_] +
+                 cpuUtil[kIRQ_] + cpuUtil[kSoftIRQ_] + cpuUtil[kSteal_];
   long total = idle + nonIdle;
-  long d_total = total - this->p_total;
-  long d_idle = idle - this->p_idle;
-  this->p_total = total;
-  this->p_idle = idle;
+  long deltaTotal = total - prevTotal;
+  long deltaIdle = idle - prevIdle;
+  prevTotal = total;
+  prevIdle = idle;
 
-  return static_cast<float>(d_total - d_idle) / static_cast<float>(d_total);
+  return static_cast<float>(deltaTotal - deltaIdle) /
+         static_cast<float>(deltaTotal);
 }
