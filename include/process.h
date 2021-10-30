@@ -21,6 +21,8 @@ class Process {
  private:
   int pid_;
   std::string uid_ = "";
+  std::string user_ = "";
+  float cpu_ = 0;
 };
 
 #endif
