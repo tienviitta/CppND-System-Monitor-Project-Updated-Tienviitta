@@ -16,20 +16,11 @@ using std::size_t;
 using std::string;
 using std::vector;
 
-// TODO: Return the system's CPU
+// Return the system's CPU
 Processor& System::Cpu() { return cpu_; }
 
-// TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() {
-  vector<int> pids = LinuxParser::Pids();
-  processes_.clear();
-  for (int pid : pids) {
-    Process* proc = new Process(pid);
-    processes_.emplace_back(*proc);
-  }
-  std::sort(processes_.rbegin(), processes_.rend());
-  return processes_;
-}
+// Return a container composed of the system's processes
+vector<Process>& System::Processes() { return processes_; }
 
 // Return the system's kernel identifier (string)
 std::string System::Kernel() {
@@ -39,9 +30,8 @@ std::string System::Kernel() {
   return kernel_;
 }
 
-// TODO: Return the system's memory utilization
+// Return the system's memory utilization
 float System::MemoryUtilization() {
-  // System memory utilization computation is based on <TODO>
   long totalUsed = procMeminfo_["MemTotal:"] - procMeminfo_["MemFree:"];
   long memTotal = procMeminfo_["MemTotal:"];
   return static_cast<float>(totalUsed) / static_cast<float>(memTotal);
@@ -52,6 +42,13 @@ std::string System::OperatingSystem() {
   if (os_ == "") {
     // Cache OS
     os_ = LinuxParser::OperatingSystem();
+    // Cache and sort processes
+    vector<int> pids = LinuxParser::Pids();
+    processes_.clear();
+    for (int pid : pids) {
+      processes_.emplace_back(Process(pid));
+    }
+    std::sort(processes_.rbegin(), processes_.rend());
   }
   // Parse /proc/stat
   procStat_ = LinuxParser::ParseProcStat();
@@ -60,15 +57,15 @@ std::string System::OperatingSystem() {
   return os_;
 }
 
-// TODO: Return the number of processes actively running on the system
+// Return the number of processes actively running on the system
 int System::RunningProcesses() {
   return static_cast<int>(procStat_["procs_running"].at(0));
 }
 
-// TODO: Return the total number of processes on the system
+// Return the total number of processes on the system
 int System::TotalProcesses() {
   return static_cast<int>(procStat_["processes"].at(0));
 }
 
-// TODO: Return the number of seconds since the system started running
+// Return the number of seconds since the system started running
 long int System::UpTime() { return LinuxParser::UpTime(); }
