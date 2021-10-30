@@ -23,6 +23,9 @@ class Process {
   std::string uid_ = "";
   std::string user_ = "";
   float cpu_ = 0;
+  std::string mem_ = "";
+  long int uptime_ = 0;
+  std::string cmd_ = "";
 };
 
 #endif

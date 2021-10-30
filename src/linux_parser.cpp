@@ -153,19 +153,45 @@ float LinuxParser::CpuUtilization(int pid) {
   return cpu;
 }
 
-// TODO: Read and return the total number of processes
+// TODO: Read and return the total number of processes (OBSOLETE)
 int LinuxParser::TotalProcesses() { return 0; }
 
-// TODO: Read and return the number of running processes
+// TODO: Read and return the number of running processes (OBSOLETE)
 int LinuxParser::RunningProcesses() { return 0; }
 
 // TODO: Read and return the command associated with a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Command(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Command(int pid) {
+  string cmd, type, path;
+  string line;
+  std::ifstream stream(kProcDirectory + to_string(pid) + kCmdlineFilename);
+  if (stream.is_open()) {
+    std::getline(stream, line);
+    std::istringstream linestream(line);
+    linestream >> cmd >> type >> path;
+  }
+  return cmd;
+}
 
 // TODO: Read and return the memory used by a process
-// REMOVE: [[maybe_unused]] once you define the function
-string LinuxParser::Ram(int pid [[maybe_unused]]) { return string(); }
+string LinuxParser::Ram(int pid) {
+  string line;
+  string key;
+  string value;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatusFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      while (linestream >> key >> value) {
+        if (key == "VmSize:") {
+          long value_int = std::stol(value) / 1000;
+          return to_string(value_int);
+          // return value;
+        }
+      }
+    }
+  }
+  return "0";
+}
 
 // TODO: Read and return the user ID associated with a process
 string LinuxParser::Uid(int pid) {
@@ -213,8 +239,10 @@ string LinuxParser::User(int pid) {
 }
 
 // TODO: Read and return the uptime of a process
-// REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid [[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime(int pid) {
+  std::vector<long> cpustat = LinuxParser::ParseProcPidStat(pid);
+  return cpustat[21];
+}
 
 // Read and return the /proc/stat
 std::map<std::string, std::vector<long>> LinuxParser::ParseProcStat() {
@@ -268,4 +296,25 @@ std::map<std::string, long> LinuxParser::ParseProcMeminfo() {
     }
   }
   return procMeminfo;
+}
+
+// Read and return the /proc/[pid]/stat
+std::vector<long> LinuxParser::ParseProcPidStat(int pid) {
+  string line;
+  long value;
+  char delim = ' ';
+  std::vector<long> cpustat;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    size_t start;
+    size_t end = 0;
+    while ((start = line.find_first_not_of(delim, end)) != std::string::npos) {
+      end = line.find(delim, start);
+      std::istringstream(line.substr(start, end - start)) >> value;
+      cpustat.emplace_back(value);
+    }
+  }
+  return cpustat;
 }
