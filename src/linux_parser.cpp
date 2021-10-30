@@ -94,16 +94,16 @@ long LinuxParser::UpTime() {
 }
 
 // Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+// long LinuxParser::Jiffies() { return 0; }
 
 // Read and return the number of active jiffies for a PID
-long LinuxParser::ActiveJiffies(int pid) { return 0; }
+// long LinuxParser::ActiveJiffies(int pid) { return 0; }
 
 // Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+// long LinuxParser::ActiveJiffies() { return 0; }
 
 // Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+// long LinuxParser::IdleJiffies() { return 0; }
 
 // Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() {
@@ -138,11 +138,11 @@ float LinuxParser::CpuUtilization(int pid) {
   return cpu;
 }
 
-// Read and return the total number of processes (OBSOLETE)
-int LinuxParser::TotalProcesses() { return 0; }
+// Read and return the total number of processes
+// int LinuxParser::TotalProcesses() { return 0; }
 
-// Read and return the number of running processes (OBSOLETE)
-int LinuxParser::RunningProcesses() { return 0; }
+// Read and return the number of running processes
+// int LinuxParser::RunningProcesses() { return 0; }
 
 // Read and return the command associated with a process
 string LinuxParser::Command(int pid) {
